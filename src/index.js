@@ -5,8 +5,8 @@ import store from './redux/store/store.js';
 
 import './index.css';
 import App from './App/App';
-import Map from './Main/Map';
+import MapComponent from './Main/MapComponent';
 
 ReactDOM.render(<Provider store={store}>
-    <Map />
+    <MapComponent />
 </Provider>, document.getElementById('root'));

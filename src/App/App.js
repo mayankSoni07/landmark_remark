@@ -5,7 +5,7 @@ import { bindActionCreators } from 'redux';
 import { testAction } from '../redux/actions';
 import './App.css';
 
-import Map from '../Main/Map';
+// import MapComponent from '../Main/MapComponent';
 
 class App extends Component {
   
