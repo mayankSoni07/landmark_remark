@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import { connect } from "react-redux";
 import { bindActionCreators } from 'redux';
 
-import { testAction } from './redux/actions';
-import './App.css';
+import { testAction } from '../redux/actions';
+// import './Map.css';
 
-class App extends Component {
+class Map extends Component {
   
   componentDidMount() {
     this.props.testAction({ test: "hello" });
@@ -14,12 +14,10 @@ class App extends Component {
   render() {
     console.log('test reducer : ', this.props.test)
     return (
-      <div className="App">
-        <header className="App-header">
+      <div className="Map">
           <p>
-           Hello World
+           Map Component
           </p>
-        </header>
       </div>
     );
   }
@@ -35,5 +33,5 @@ const mapDispatchToProps = (dispatch, getState) => bindActionCreators({
   testAction
 }, dispatch);
 
-App = connect(mapStateToProps, mapDispatchToProps)(App)
-export default App;
+Map = connect(mapStateToProps, mapDispatchToProps)(Map)
+export default Map;
