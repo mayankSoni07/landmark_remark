@@ -7,26 +7,22 @@ import React, { Component } from 'react';
 
 import { Map, InfoWindow, Marker, GoogleApiWrapper } from 'google-maps-react';
 
-let self;
-
 class MapComponent extends Component {
 
     constructor(props) {
         super(props);
-        self = this;
         this.state = {
-            kholDo: false
+            infoVisible: false
         };
     }
 
     showPosition(position) {
-        console.log(position)
-        self.setState({ currentLat: position.coords.latitude, currentLong: position.coords.longitude });
+        this.setState({ currentLat: position.coords.latitude, currentLong: position.coords.longitude });
     }
 
     componentDidMount() {
         console.log(this);
-        navigator.geolocation.getCurrentPosition(this.showPosition);
+        navigator.geolocation.getCurrentPosition(this.showPosition.bind(this));
     }
 
     render() {
@@ -36,29 +32,29 @@ class MapComponent extends Component {
                 <p>
                     MapComponent Component
                 </p>
-                {self.state.currentLong &&
+                {this.state.currentLong &&
                     <Map google={this.props.google} zoom={14}
                         initialCenter={{
-                            lat: self.state.currentLat,
-                            lng: self.state.currentLong
+                            lat: this.state.currentLat,
+                            lng: this.state.currentLong
                         }}
                     >
 
                         <Marker
                             title={'The marker`s title will appear as a tooltip.'}
                             name={'Khatam'}
-                            position={{ lat: self.state.currentLat, lng: self.state.currentLong }}
+                            position={{ lat: this.state.currentLat, lng: this.state.currentLong }}
                             onClick={(props, marker, e) => {
                                 console.log("Marker 1 : ", props, marker, e)
-                                self.setState({ markerProp: props, marker: marker, markerE: e, kholDo: true })
+                                this.setState({ markerProp: props, marker: marker, markerE: e, infoVisible: true })
                             }}
                             onMouseover={(props, marker, e) => {
-                                console.log("Marker 1, mousehouver : ", self.state.markerProp, props, marker, e)
-                                if (!self.state.markerProp) {
-                                    self.setState({ markerProp: props, marker: marker, markerE: e, kholDo: true })
+                                console.log("Marker 1, mousehouver : ", this.state.markerProp, props, marker, e)
+                                if (!this.state.markerProp) {
+                                    this.setState({ markerProp: props, marker: marker, markerE: e, infoVisible: true })
                                 } else {
-                                    if (self.state.markerProp.name !== props.name)
-                                        self.setState({ markerProp: props, marker: marker, markerE: e, kholDo: true })
+                                    if (this.state.markerProp.name !== props.name)
+                                        this.setState({ markerProp: props, marker: marker, markerE: e, infoVisible: true })
                                 }
                             }}
                         />
@@ -68,28 +64,26 @@ class MapComponent extends Component {
                             name={'AMAN'}
                             position={{ lat: 37.759703, lng: -122.428093 }}
                             onClick={(props, marker, e) => {
-                                console.log("Marker 2 : ", props, marker, e)
-                                self.setState({ markerProp: props, marker: marker, markerE: e, kholDo: true })
+                                this.setState({ markerProp: props, marker: marker, markerE: e, infoVisible: true })
                             }}
                             onMouseover={(props, marker, e) => {
-                                console.log("Marker 2, mousehouver : ", self.state.markerProp, props, marker, e)
-                                if (!self.state.markerProp) {
-                                    self.setState({ markerProp: props, marker: marker, markerE: e, kholDo: true })
+                                if (!this.state.markerProp) {
+                                    this.setState({ markerProp: props, marker: marker, markerE: e, infoVisible: true })
                                 } else {
-                                    if (self.state.markerProp.name !== props.name)
-                                        self.setState({ markerProp: props, marker: marker, markerE: e, kholDo: true })
+                                    if (this.state.markerProp.name !== props.name)
+                                        this.setState({ markerProp: props, marker: marker, markerE: e, infoVisible: true })
                                 }
                             }}
                         />
                         <InfoWindow
-                            marker={self.state.marker}
-                            visible={self.state.kholDo}
+                            marker={this.state.marker}
+                            visible={this.state.infoVisible}
                             onClose={() => {
-                                self.setState({ kholDo: false })
+                                this.setState({ infoVisible: false })
                             }}
                         >
                             <div>
-                                <h1>{self.state.markerProp && self.state.markerProp.name}</h1>
+                                <h1>{this.state.markerProp && this.state.markerProp.name}</h1>
                             </div>
                         </InfoWindow>
 
