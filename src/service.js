@@ -47,6 +47,7 @@ export default class ServiceController {
 
     /**
      * Find the all user with their location
+     * @param {String} id Id of the given user
      * @return {Promise<Array>} return array of the location object
      */
     static getAllLogOutUsersWithLocation(id) {
@@ -72,5 +73,47 @@ export default class ServiceController {
         const location_notes = getLocationNotes();
         location_notes.push({ 'cordinate': location, 'text': notes, 'userId': userId });
         return this.getLocationOfUser(userId);
+    }
+
+    /**
+     * Get all user with their location
+     * @returns {Array<Object>}
+     */
+    static getAllUsersWithLocation() {
+        const users = getUsers();
+        const location_notes = getLocationNotes();
+        const usersWithLocationNotes = [];
+        users.forEach((user) => {
+            const location = _filter(location_notes, { 'userId': user.id });
+            usersWithLocationNotes.push({ ...user, 'location': location });
+        });
+        return usersWithLocationNotes;
+    }
+
+    /**
+     * Search the user on the basis of given text keyword
+     * @param {String} escText text keyword
+     * @returns {Array<Object>} 
+     */
+    static searchUser(escText) {
+        const usersWithLocationNotes = this.getAllUsersWithLocation();
+        const searchedUser = _filter(usersWithLocationNotes, function (obj) {
+            return (new RegExp(`.*${escText}.*`, 'i')).test(obj.name) || this.searchUserInLocation(escText, obj.location);
+        })
+        return searchedUser;
+    }
+
+    /**
+     * Helper function to evaulate the search keyword in the location list
+     * @param {String} escText The text that need to be searched
+     * @param {Array} location Array of location in which the text will be searched
+     */
+    static searchUserInLocation(escText, location = []) {
+        for (let i of location) {
+            if ((new RegExp(`.*${escText}.*`, 'i')).test(i.text)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
