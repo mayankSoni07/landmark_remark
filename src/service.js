@@ -2,7 +2,6 @@ import { find as _find } from 'lodash';
 import { filter as _filter } from 'lodash';
 import { getUsers, getLocationNotes } from './data';
 
-
 export default class ServiceController {
 
     /**
@@ -97,8 +96,9 @@ export default class ServiceController {
      */
     static searchUser(escText) {
         const usersWithLocationNotes = this.getAllUsersWithLocation();
+        const searchUserInLocation = this.searchUserInLocation;
         const searchedUser = _filter(usersWithLocationNotes, function (obj) {
-            return (new RegExp(`.*${escText}.*`, 'i')).test(obj.name) || this.searchUserInLocation(escText, obj.location);
+            return (new RegExp(`.*${escText}.*`, 'i')).test(obj.name) || searchUserInLocation(escText, obj.location);
         })
         return searchedUser;
     }

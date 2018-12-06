@@ -1,0 +1,15 @@
+.btn-black{
+    background-color: #1a1e29;
+    border-radius: 20px;
+    padding: 6px 30px;
+    color: #fff;
+}
+
+.btn-black-right{
+    background-color: #1a1e29;
+    border-radius: 20px;
+    padding: 6px 30px;
+    color: #fff;
+    position: absolute;
+    right: 0
+}
