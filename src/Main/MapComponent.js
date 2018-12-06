@@ -1,116 +1,107 @@
 import React, { Component } from 'react';
-// import { connect } from "react-redux";
-// import { bindActionCreators } from 'redux';
-
-// import { testAction } from '../redux/actions';
-// import './MapComponent.css';
-
 import { Map, InfoWindow, Marker, GoogleApiWrapper } from 'google-maps-react';
+import ServiceController from '../service';
 
-let self;
 
 class MapComponent extends Component {
 
     constructor(props) {
         super(props);
-        self = this;
         this.state = {
-            kholDo: false
+            infoVisible: false,
+            loggedInUser: ServiceController.getLoggedInUser(1),
+            userLocation: ServiceController.getLocationOfUser(1),
+            otherUsers: ServiceController.getAllLogOutUsersWithLocation(1)
         };
     }
 
     showPosition(position) {
-        console.log(position)
-        self.setState({ currentLat: position.coords.latitude, currentLong: position.coords.longitude });
+        this.setState({ currentLat: position.coords.latitude, currentLong: position.coords.longitude });
     }
 
     componentDidMount() {
-        console.log(this);
-        navigator.geolocation.getCurrentPosition(this.showPosition);
+        navigator.geolocation.getCurrentPosition(this.showPosition.bind(this));
+    }
+
+    genrateMarkersForLoggedOutUser() {
+        return this.state.otherUsers.map((user) => {
+            return user.location.map((location) => {
+                return this.markerComponent(user.name, location);
+            });
+        });
+    }
+
+    genrateMarkersForLoggedInUser() {
+        return this.state.userLocation.map((location) => {
+            return this.markerComponent(this.state.loggedInUser.name, location);
+        });
+    }
+
+    markerComponent(username, location) {
+        return (
+            <Marker
+                title={`${username} Loaction`}
+                name={location.text}
+                position={{ lat: location.cordinate[0], lng: location.cordinate[1] }}
+                onClick={(props, marker, e) => {
+                    this.setState({ markerProp: props, marker: marker, markerE: e, infoVisible: true })
+                }}
+                onMouseover={(props, marker, e) => {
+                    if (!this.state.markerProp) {
+                        this.setState({ markerProp: props, marker: marker, markerE: e, infoVisible: true })
+                    } else {
+                        if (this.state.markerProp.name !== props.name)
+                            this.setState({ markerProp: props, marker: marker, markerE: e, infoVisible: true })
+                    }
+                }}
+                key={location.cordinate[0]}
+            />)
+    }
+
+    addNoteToCurrent() {
+        const result = ServiceController.addNotesToLocation(
+            [this.state.currentLat, this.state.currentLong],
+            'Hey! My Current Location',
+            1)
+        this.setState({ userLocation: result });
     }
 
     render() {
-        // console.log('test reducer : ', this.props.test)
         return (
             <div className="MapComponent">
                 <p>
                     MapComponent Component
                 </p>
-                {self.state.currentLong &&
-                    <Map google={this.props.google} zoom={14}
+                <button type="button" onClick={this.addNoteToCurrent.bind(this)}>Add note to current Location</button>
+                {this.state.currentLong &&
+                    <Map google={this.props.google} zoom={7}
                         initialCenter={{
-                            lat: self.state.currentLat,
-                            lng: self.state.currentLong
+                            lat: this.state.currentLat,
+                            lng: this.state.currentLong
                         }}
                     >
+                        {this.genrateMarkersForLoggedInUser()}
+                        {this.genrateMarkersForLoggedOutUser()}
 
-                        <Marker
-                            title={'The marker`s title will appear as a tooltip.'}
-                            name={'Khatam'}
-                            position={{ lat: self.state.currentLat, lng: self.state.currentLong }}
-                            onClick={(props, marker, e) => {
-                                console.log("Marker 1 : ", props, marker, e)
-                                self.setState({ markerProp: props, marker: marker, markerE: e, kholDo: true })
-                            }}
-                            onMouseover={(props, marker, e) => {
-                                console.log("Marker 1, mousehouver : ", self.state.markerProp, props, marker, e)
-                                if (!self.state.markerProp) {
-                                    self.setState({ markerProp: props, marker: marker, markerE: e, kholDo: true })
-                                } else {
-                                    if (self.state.markerProp.name !== props.name)
-                                        self.setState({ markerProp: props, marker: marker, markerE: e, kholDo: true })
-                                }
-                            }}
-                        />
-
-                        <Marker
-                            title={'title 2.'}
-                            name={'AMAN'}
-                            position={{ lat: 37.759703, lng: -122.428093 }}
-                            onClick={(props, marker, e) => {
-                                console.log("Marker 2 : ", props, marker, e)
-                                self.setState({ markerProp: props, marker: marker, markerE: e, kholDo: true })
-                            }}
-                            onMouseover={(props, marker, e) => {
-                                console.log("Marker 2, mousehouver : ", self.state.markerProp, props, marker, e)
-                                if (!self.state.markerProp) {
-                                    self.setState({ markerProp: props, marker: marker, markerE: e, kholDo: true })
-                                } else {
-                                    if (self.state.markerProp.name !== props.name)
-                                        self.setState({ markerProp: props, marker: marker, markerE: e, kholDo: true })
-                                }
-                            }}
-                        />
                         <InfoWindow
-                            marker={self.state.marker}
-                            visible={self.state.kholDo}
+                            marker={this.state.marker}
+                            visible={this.state.infoVisible}
                             onClose={() => {
-                                self.setState({ kholDo: false })
+                                this.setState({ infoVisible: false })
                             }}
                         >
                             <div>
-                                <h1>{self.state.markerProp && self.state.markerProp.name}</h1>
+                                <h1>{this.state.markerProp && this.state.markerProp.name}</h1>
                             </div>
                         </InfoWindow>
-
                     </Map>}
             </div>
         );
     }
 }
 
-// const mapStateToProps = state => {
-//     return {
-//         test: state.testReducer.test
-//     }
-// }
 
-// const mapDispatchToProps = (dispatch, getState) => bindActionCreators({
-//     testAction
-// }, dispatch);
-
-// Map = connect(mapStateToProps, mapDispatchToProps)(Map)
 export default GoogleApiWrapper({
-    apiKey: ("AIzaSyDL2ykzdT6SCFE6wFyZLg2x5lQGEPTKQyA")
+    apiKey: ("AIzaSyBnOC2cYnLyaaYXtnd_IEQWZLkqvg0tqoE")
 })(MapComponent)
 // export default MapComponent;
