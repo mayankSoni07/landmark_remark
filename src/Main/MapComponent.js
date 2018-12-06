@@ -26,18 +26,18 @@ class MapComponent extends Component {
     genrateMarkersForLoggedOutUser() {
         return this.state.otherUsers.map((user) => {
             return user.location.map((location) => {
-                return this.markerComponent(user.name, location);
+                return this.markerComponent(user.name, location, false);
             });
         });
     }
 
     genrateMarkersForLoggedInUser() {
         return this.state.userLocation.map((location) => {
-            return this.markerComponent(this.state.loggedInUser.name, location);
+            return this.markerComponent(this.state.loggedInUser.name, location, true);
         });
     }
 
-    markerComponent(username, location) {
+    markerComponent(username, location, isLoggedInUser) {
         return (
             <Marker
                 title={`${username} Loaction`}
@@ -55,6 +55,10 @@ class MapComponent extends Component {
                     }
                 }}
                 key={location.cordinate[0]}
+                icon={{
+                    url: isLoggedInUser ? require('./markerRed.png') : require('./markerBlue.png'),
+                    scaledSize: { width: 50, height: 50 }
+                }}
             />)
     }
 
